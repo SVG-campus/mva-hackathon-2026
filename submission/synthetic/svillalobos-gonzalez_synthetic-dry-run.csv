@@ -1,0 +1,4 @@
+proband_id,chrom_1,pos_1,ref_1,alt_1,chrom_2,pos_2,ref_2,alt_2,epcr,finding_type,notes
+SYNTHETIC-ONLY,chr1,100000,A,G,chr1,100500,C,T,0.90,primary,Synthetic fixture only; not a patient-derived candidate.
+SYNTHETIC-ONLY,chr2,200000,G,A,chr2,200600,T,C,0.70,primary,Synthetic fixture only; not a patient-derived candidate.
+SYNTHETIC-ONLY,chr3,300000,C,T,,,,,0.40,primary,Synthetic fixture only; not a patient-derived candidate.

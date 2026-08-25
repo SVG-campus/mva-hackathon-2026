@@ -2,7 +2,7 @@
 
 This repository is the local, reproducible preparation area for the SageBio **Rare Disease, Real Kid: MVA Hackathon 2026**.
 
-Current status: **preliminary public-source, synthetic-scorer, and public-toolchain pass only**. No real-child genomic or clinical data have been downloaded into this repository, no live challenge submission has been made, and no medical or causal claim has been established.
+Current status: **public-source, synthetic-scorer, public-toolchain, and submission-scaffold pass only**. No real-child genomic or clinical data have been downloaded into this repository, no live challenge submission has been made, and no medical or causal claim has been established.
 
 ## Selected development route
 
@@ -16,6 +16,12 @@ The project is intentionally designed so public code operates on synthetic fixtu
 
 ```powershell
 & 'C:\Users\svillalobosgonzalez1\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest discover -s tests -v
+```
+
+The current receipt is **15 tests passing**. To validate a structurally complete Track 1 CSV without submitting it:
+
+```powershell
+& 'C:\Users\svillalobosgonzalez1\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\validate_track1_submission.py submission\synthetic\svillalobos-gonzalez_synthetic-dry-run.csv
 ```
 
 ## Important files
@@ -32,3 +38,6 @@ The project is intentionally designed so public code operates on synthetic fixtu
 - `docs/TOOLCHAIN.md` — pinned public analysis stack, versions, integrity limits, and licenses.
 - `challenge_reference/evaluation.py` — unmodified public Track 1 evaluator snapshot.
 - `tests/test_scoring_mechanics.py` — synthetic tests of evaluator behavior.
+- `scripts/validate_track1_submission.py` — fail-closed official-schema and rank validation before evaluator replay.
+- `submission/track1_report_scaffold.md` — public-safe report structure with no patient-specific result.
+- `submission/synthetic/` — artificial dry-run files that must never be uploaded to the challenge.
