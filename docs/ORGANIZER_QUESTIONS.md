@@ -4,7 +4,7 @@ No message has been sent from this project. The user should post or email these 
 
 ## Priority 0 — wait for the existing public thread
 
-The public discussion already asks whether third-party hosted LLM/API processing constitutes prohibited data release, whether zero-retention/no-training terms are required, which derived artifacts are covered, and how provider logs can meet the deletion obligation. Do not duplicate it immediately; follow the existing thread and request a response if it remains unanswered.
+The public discussion already asks whether third-party hosted LLM/API processing constitutes prohibited data release, whether zero-retention/no-training terms are required, which derived artifacts are covered, and how provider logs can meet the deletion obligation. On 2026-08-26, Sage's President acknowledged the questions, said the team would reply point by point, and instructed participants to interpret every data-use clause conservatively until then. Do not duplicate the question; keep the real-data gate closed and follow the thread for the promised detailed answer.
 
 Discussion: https://huggingface.co/spaces/SageBio/rare-disease-real-kid-mva-hackathon-2026/discussions/2
 
@@ -26,4 +26,4 @@ Discussion: https://huggingface.co/spaces/SageBio/rare-disease-real-kid-mva-hack
 
 ## Stop rule
 
-Do not send repeated requests more often than once per seven days. If there is no answer by 2026-09-08, use the most conservative interpretation in every submission artifact and state the ambiguity.
+Do not send repeated requests more often than once per seven days. The 2026-08-26 interim response makes another bump unnecessary. If there is no point-by-point answer by 2026-09-08, use the most conservative interpretation in every submission artifact and state the ambiguity.
