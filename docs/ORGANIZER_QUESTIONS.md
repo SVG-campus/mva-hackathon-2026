@@ -2,9 +2,9 @@
 
 No message has been sent from this project. The user should post or email these questions manually, without including patient-level information.
 
-## Priority 0 — wait for the existing public thread
+## Resolved 2026-08-26 — hosted processors and deletion
 
-The public discussion already asks whether third-party hosted LLM/API processing constitutes prohibited data release, whether zero-retention/no-training terms are required, which derived artifacts are covered, and how provider logs can meet the deletion obligation. On 2026-08-26, Sage's President acknowledged the questions, said the team would reply point by point, and instructed participants to interpret every data-use clause conservatively until then. Do not duplicate the question; keep the real-data gate closed and follow the thread for the promised detailed answer.
+Sage's Chief Privacy and Compliance Officer supplied the promised point-by-point answer. A hosted service may act as a processor when it takes no rights in inputs or outputs, performs no training, and retains material only for a limited operational purpose. Zero retention and local inference are not required. Participants must inspect the exact provider, plan/tier, settings, retention, and any credit-program terms, and must not rate outputs containing challenge material. The answer also defines which findings may remain and which genome-bearing artifacts must be deleted. The operational interpretation is frozen in `docs/DATA_GOVERNANCE.md` and `docs/PROVIDER_TERMS_CHECKLIST.md`.
 
 Discussion: https://huggingface.co/spaces/SageBio/rare-disease-real-kid-mva-hackathon-2026/discussions/2
 
@@ -12,9 +12,9 @@ Discussion: https://huggingface.co/spaces/SageBio/rare-disease-real-kid-mva-hack
 
 > The FAQ says secondary/incidental findings will not hurt automated scoring, but the current public evaluator appears to rank and threshold all rows without filtering `finding_type`. Can you confirm whether participants should expect secondary rows to affect rank and F-max, and whether the deployed evaluator will change?
 
-## Priority 2 — derived-data publication versus deletion
+## Resolved — derived-data publication versus deletion
 
-> The rules require deletion of source, intermediate, and derived datasets within 30 days after close, while also allowing code, models, and derived outputs to be public. Could you define which patient-derived outputs may remain in the required public GitHub/report and which must be deleted?
+The organizer permits a short ranked candidate list, HPO terms, gene/pathway rankings, mechanism analyses, drug candidates, code, report, pitch, and leaderboard entry to remain. Raw genomic files and indexes, slices/reformats, genome-scale genotype intermediates and caches, stored prompts containing blocks of variant data, and models trained on raw genomic data must be deleted. See `docs/DATA_GOVERNANCE.md` for the reconstruction boundary.
 
 ## Priority 3 — prize allocation
 
@@ -26,4 +26,4 @@ Discussion: https://huggingface.co/spaces/SageBio/rare-disease-real-kid-mva-hack
 
 ## Stop rule
 
-Do not send repeated requests more often than once per seven days. The 2026-08-26 interim response makes another bump unnecessary. If there is no point-by-point answer by 2026-09-08, use the most conservative interpretation in every submission artifact and state the ambiguity.
+Do not repeat a resolved question. Re-open the privacy thread only if a specific provider term or workflow creates a new material ambiguity that cannot be resolved from the written answer.

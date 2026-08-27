@@ -17,8 +17,9 @@ We use a transparent, VCF-first rare-disease prioritisation workflow designed fo
 ## Inputs and data boundary
 
 - Challenge input: gated GRCh38 VCF, index, and clinical/phenotype material accessed only in the approved private environment.
-- Public repository: code, versions, schemas, synthetic fixtures, and non-identifying receipts only.
-- Explicit exclusions: no real coordinates, alleles, patient HPO terms, filenames, logs, prompts, or derived candidate rankings in public or hosted systems unless the organizer provides written permission.
+- Public repository: code, versions, schemas, synthetic fixtures, non-identifying receipts, and only the organizer-permitted findings that pass manual publication review.
+- Hosted processors: allowed only after documenting no-training/no-rights terms, limited-purpose retention, provider/tier/settings, and any credit-specific overrides. Do not rate outputs containing challenge material.
+- Explicit exclusions: no raw genomic files, indexes, genome-scale genotype tables, reconstructive intermediates, stored prompts containing blocks of variant data, or models trained on raw genomic data in public artifacts.
 - Deletion: source, intermediate, and covered derived data will be removed within the organizer-required period and verified with a non-identifying receipt.
 
 ## Computational approach

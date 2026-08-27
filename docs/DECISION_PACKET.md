@@ -9,7 +9,7 @@ Which submission route gives this team the best evidence-governed chance of a st
 1. The public challenge source and evaluator at the commits in `SOURCE_MANIFEST.md` remain authoritative until a later commit is detected.
 2. The supplied VCF is GRCh38 and contains enough information to test a variant-first route; this is a hypothesis, not an established fact.
 3. The answer is one exact compound-heterozygous pair, as encoded in the public evaluator.
-4. Real patient data and patient-derived artifacts remain outside hosted AI/API systems until the organizer resolves the public data-handling question.
+4. Hosted processors are conditionally allowed under the organizer's 2026-08-26 answer, but each provider, tier, retention policy, and setting must pass `PROVIDER_TERMS_CHECKLIST.md`. The current Codex/ChatGPT task remains excluded from patient-derived content until independently verified.
 5. A drug proposal is not a treatment recommendation. It must be downstream of a supported causal mechanism.
 
 ## Objective lenses and hard gates

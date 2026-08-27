@@ -1,4 +1,4 @@
-# GCP runbook — public preflight authorized; private execution gated
+# GCP runbook — public preflight complete; conditional private execution
 
 ## Decision
 
@@ -6,7 +6,7 @@ Use a **new dedicated GCP project**, not GitHub and not Kaggle, for the private 
 
 On 2026-08-25 the user authorized a dedicated project and public-only toolchain preflight under the USD 20 ceiling. The exact project/resource identifiers are retained only in an ignored local state file. No gated challenge data or Hugging Face token entered the VM.
 
-The **private-data phase remains gated** until the user accepts the dataset terms and the hosted-AI boundary is resolved for the intended workflow. Authentication must be interactive; credentials and tokens must never be pasted into chat, source, shell history, or captured logs.
+The user has accepted the dataset terms. The organizer's 2026-08-26 point-by-point guidance permits hosted processing when the service takes no rights in the data, performs no training, and uses only limited-purpose, time-bounded retention. Before private execution, complete `docs/PROVIDER_TERMS_CHECKLIST.md` for GCP and any annotation or AI service actually used. Authentication must be interactive; credentials and tokens must never be pasted into chat, source, shell history, or captured logs. Patient-derived content remains unavailable to this agent until the exact Codex/OpenAI plan and settings independently pass the same checklist.
 
 ## Frozen first-run envelope
 

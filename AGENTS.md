@@ -4,11 +4,11 @@ This project supports the 2026 SageBio "Rare Disease, Real Kid" MVA Hackathon.
 
 ## Non-negotiable data boundary
 
-- The challenge data describe a real child. Never commit, paste, upload, summarize, or expose individual-level genomic or clinical content to a public repository or a hosted AI/API service.
-- Until the organizers answer the public third-party-LLM/data-handling question, treat all gated source data and derived patient-specific artifacts as local-only and unavailable to agents.
-- Public code may contain schemas, synthetic fixtures, and aggregate non-identifying receipts only. It must not contain real coordinates, alleles, HPO terms, screenshots, logs, candidate lists, or prompts derived from the child.
+- The challenge data describe a real child. Never place raw, genome-scale, reconstructive, or otherwise prohibited patient material in a public repository or an unreviewed hosted service. Only organizer-permitted findings may be published after manual review, and only services with a dated `PASS_PROCESSOR` record may process gated material.
+- Before any hosted service processes gated or patient-derived material, record the provider, plan/tier, applicable terms, retention period/purpose, and exact settings. The service must take no rights in inputs or outputs, perform no training on them, and retain content only for a limited operational purpose. Do not rate outputs or submit feedback containing challenge material.
+- Public code may contain schemas, synthetic fixtures, non-identifying receipts, and manually reviewed research findings permitted by the organizers, including a short ranked candidate list and HPO/gene/pathway analyses. It must not contain raw genomic files, genome-scale genotype tables, slices/reformats, annotated variant tables, notebook state, stored prompts with blocks of variant data, trained weights/embeddings from raw genomic data, or anything enabling reconstruction of a meaningful portion of the child's genome.
 - Do not search for or use public family stories to re-identify the child or infer the hidden answer key.
-- Keep the official 30-day post-close deletion and confirmation requirement as a fail-closed release gate.
+- Keep the official 30-day post-close deletion and confirmation requirement as a fail-closed release gate. Delete controlled copies of VCF/BAM/CRAM data, indexes, genome-scale intermediates, caches/notebook state, stored prompts containing variant blocks, and models trained on raw genomic data. Provider logs outside the participant's control are governed by the documented processor terms.
 
 ## Action boundary
 
