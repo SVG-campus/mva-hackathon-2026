@@ -37,6 +37,10 @@ Create one isolated ephemeral GCP VM in the exact owner-selected project/account
 - Candidate ranking from this single challenge case: at most **C2 observational evidence**.
 - No output is a diagnosis, clinical validation, treatment recommendation, or winning probability.
 
+## Retained execution failure
+
+- The first private QC invocation used a nonexistent `bcftools quickcheck` subcommand and therefore failed before inspecting variant records. The downloaded files matched their repository metadata and hashes. The guard was replaced with explicit repository-size equality, `bcftools view --header-only`, indexed-record, GRCh38, sample, and genotype checks; the failed marker is retained in the execution history rather than counted as a biological failure.
+
 ## Falsifiers and negative controls
 
 - Stop if the VCF build, sample, genotype, call-quality, or indexing checks fail.

@@ -136,10 +136,14 @@ def main() -> int:
     phenotype = Path(manifest["local_files"]["phenotype"])
     if not all(path.is_file() for path in (vcf, index, phenotype)):
         raise RuntimeError("Fail closed: a selected private input is missing")
+    for role, path in (("variant", vcf), ("index", index), ("phenotype", phenotype)):
+        if path.stat().st_size != int(manifest["sizes"][role]):
+            raise RuntimeError(f"Fail closed: {role} file size differs from repository metadata")
 
-    quickcheck = run(["bcftools", "quickcheck", "-v", str(vcf)])
-    if quickcheck.returncode != 0:
-        raise RuntimeError("Fail closed: bcftools quickcheck failed")
+    header_result = run(["bcftools", "view", "--header-only", str(vcf)])
+    if header_result.returncode != 0 or not header_result.stdout.startswith("##fileformat=VCF"):
+        raise RuntimeError("Fail closed: VCF header validation failed")
+    header = header_result.stdout
 
     sample_result = run(["bcftools", "query", "--list-samples", str(vcf)])
     samples = [line.strip() for line in sample_result.stdout.splitlines() if line.strip()]
@@ -154,10 +158,6 @@ def main() -> int:
     if record_count <= 0:
         raise RuntimeError("Fail closed: VCF contains no records")
 
-    header_result = run(["bcftools", "view", "--header-only", str(vcf)])
-    if header_result.returncode != 0:
-        raise RuntimeError("Fail closed: VCF header read failed")
-    header = header_result.stdout
     build_is_grch38 = (
         "GRCh38" in header
         or "hg38" in header.lower()
