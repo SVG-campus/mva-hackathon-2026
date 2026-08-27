@@ -2,6 +2,7 @@ from pathlib import Path
 
 from scripts.gcp_private_build_shortlist import _strict_epcr, read_pairs
 from scripts.gcp_private_intake import classify
+from scripts.gcp_private_qc import map_hpo_terms
 from scripts.gcp_private_run_exomiser import write_packet
 
 
@@ -63,3 +64,24 @@ def test_shortlist_epcr_is_strictly_descending() -> None:
     values = _strict_epcr([0.7, 0.7, 0.9, 0.01])
     assert all(left > right for left, right in zip(values, values[1:]))
     assert all(0 < value <= 1 for value in values)
+
+
+def test_hpo_fallback_maps_exact_terms_and_rejects_negation(tmp_path: Path) -> None:
+    ontology = tmp_path / "hp.obo"
+    ontology.write_text(
+        """format-version: 1.2
+
+[Term]
+id: HP:0000252
+name: Microcephaly
+synonym: "Small head" EXACT []
+
+[Term]
+id: HP:0001250
+name: Seizure
+synonym: "Seizures" EXACT []
+""",
+        encoding="utf-8",
+    )
+    matches = map_hpo_terms("Microcephaly. No seizures.", ontology)
+    assert [match["id"] for match in matches] == ["HP:0000252"]

@@ -25,7 +25,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 - Organizer processor/deletion answer: discussion #2, timestamp `2026-08-26T22:28:34Z`.
 - GCP public synthetic receipt: `PUBLIC_PREFLIGHT_RECEIPT.md`.
 - Provider decision: `PROVIDER_TERMS_CHECKLIST.md`.
-- Local structural suite: 19 tests passed after the private intake, control, and compound-pair shortlist gates were added.
+- Local structural suite: 20 tests passed after the private intake, local HPO-mapping fallback, control, and compound-pair shortlist gates were added.
 
 ## Decision
 
@@ -40,6 +40,7 @@ Create one isolated ephemeral GCP VM in the exact owner-selected project/account
 ## Falsifiers and negative controls
 
 - Stop if the VCF build, sample, genotype, call-quality, or indexing checks fail.
+- Prefer explicit HPO identifiers. If absent, permit only unambiguous exact HPO names/synonyms mapped locally against the frozen public ontology; reject negated terms and retain the short mapping for review.
 - Stop if a command would print, transmit, or persist a genome-scale table outside the private VM.
 - Phenotype-shuffle, phenotype-ablation, panel-ablation, and pair-ablation controls must remain in the receipt even when unfavorable. A true frequency-only ordering is derived separately from reported population-frequency fields; removing HPO terms alone is not labelled frequency-only.
 - Abstain if no candidate pair survives rarity, quality, inheritance, disease-validity, and literature review.

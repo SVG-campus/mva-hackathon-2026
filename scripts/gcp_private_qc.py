@@ -19,6 +19,12 @@ SAFE_RECEIPT_PATH = BASE_DIR / "qc_safe_receipt.json"
 PHENOPACKET_PATH = BASE_DIR / "phenopacket.yml"
 CLINICAL_TEXT_PATH = BASE_DIR / "clinical_text.txt"
 HPO_RE = re.compile(r"HP:\d{7}")
+HPO_OBO_PATH = Path("/opt/mva-public/hp.obo")
+HPO_MAPPING_PATH = BASE_DIR / "hpo_mapping_private.json"
+NEGATION_RE = re.compile(
+    r"\b(?:no|not|without|denies|denied|negative\s+for|absence\s+of)\b",
+    flags=re.IGNORECASE,
+)
 
 
 def run(args: list[str], *, text: bool = True) -> subprocess.CompletedProcess[str]:
@@ -43,6 +49,83 @@ def extract_clinical_text(path: Path) -> str:
 
 def yaml_quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
+
+
+def _normalise_phrase(value: str) -> str:
+    return " ".join(re.findall(r"[a-z0-9]+", value.lower()))
+
+
+def _load_hpo_phrases(path: Path) -> dict[str, tuple[str, str]]:
+    if not path.is_file():
+        raise RuntimeError("Fail closed: local HPO ontology is unavailable")
+    phrase_candidates: dict[str, set[tuple[str, str]]] = {}
+    current: dict[str, object] | None = None
+
+    def flush() -> None:
+        nonlocal current
+        if not current or current.get("obsolete") or not current.get("id") or not current.get("name"):
+            current = None
+            return
+        hpo_id = str(current["id"])
+        label = str(current["name"])
+        for term in [label, *list(current.get("synonyms", []))]:
+            phrase = _normalise_phrase(str(term))
+            tokens = phrase.split()
+            if not phrase or (len(tokens) == 1 and len(phrase) < 8):
+                continue
+            phrase_candidates.setdefault(phrase, set()).add((hpo_id, label))
+        current = None
+
+    for raw_line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = raw_line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            flush()
+            current = {"synonyms": []} if line == "[Term]" else None
+        elif current is None:
+            continue
+        elif line.startswith("id: HP:"):
+            current["id"] = line.removeprefix("id: ")
+        elif line.startswith("name: "):
+            current["name"] = line.removeprefix("name: ")
+        elif line.startswith("synonym: "):
+            match = re.match(r'synonym: "([^"]+)"', line)
+            if match:
+                current["synonyms"].append(match.group(1))  # type: ignore[union-attr]
+        elif line == "is_obsolete: true":
+            current["obsolete"] = True
+    flush()
+    return {
+        phrase: next(iter(values))
+        for phrase, values in phrase_candidates.items()
+        if len(values) == 1
+    }
+
+
+def map_hpo_terms(clinical_text: str, ontology_path: Path = HPO_OBO_PATH) -> list[dict[str, str]]:
+    """Map only unambiguous exact HPO names/synonyms outside negated clauses."""
+    phrases = _load_hpo_phrases(ontology_path)
+    matches: dict[str, dict[str, str]] = {}
+    for segment in re.split(r"[\r\n.!?;]+", clinical_text):
+        normalised = _normalise_phrase(segment)
+        if not normalised:
+            continue
+        tokens = normalised.split()
+        for size in range(1, min(12, len(tokens)) + 1):
+            for start in range(0, len(tokens) - size + 1):
+                phrase = " ".join(tokens[start : start + size])
+                if phrase not in phrases:
+                    continue
+                prefix = " ".join(tokens[max(0, start - 8) : start])
+                if NEGATION_RE.search(prefix):
+                    continue
+                hpo_id, label = phrases[phrase]
+                matches[hpo_id] = {
+                    "id": hpo_id,
+                    "label": label,
+                    "matched_term": phrase,
+                    "method": "exact_hpo_name_or_synonym",
+                }
+    return [matches[hpo_id] for hpo_id in sorted(matches)]
 
 
 def main() -> int:
@@ -93,8 +176,15 @@ def main() -> int:
     CLINICAL_TEXT_PATH.write_text(clinical_text, encoding="utf-8")
     CLINICAL_TEXT_PATH.chmod(0o600)
     hpo_ids = sorted(set(HPO_RE.findall(clinical_text)))
+    hpo_source = "explicit_identifiers"
     if not hpo_ids:
-        raise RuntimeError("Fail closed: no explicit HPO identifiers found")
+        mapped_terms = map_hpo_terms(clinical_text)
+        hpo_ids = [item["id"] for item in mapped_terms]
+        hpo_source = "exact_ontology_phrase"
+        HPO_MAPPING_PATH.write_text(json.dumps(mapped_terms, indent=2) + "\n", encoding="utf-8")
+        HPO_MAPPING_PATH.chmod(0o600)
+    if not hpo_ids:
+        raise RuntimeError("Fail closed: no explicit or unambiguous exact HPO terms found")
 
     phenopacket_lines = [
         "---",
@@ -127,6 +217,7 @@ def main() -> int:
         "build": "GRCh38",
         "format_fields": sorted(format_fields),
         "hpo_ids": hpo_ids,
+        "hpo_source": hpo_source,
         "vcf": str(vcf),
         "index": str(index),
         "phenotype": str(phenotype),
@@ -144,6 +235,7 @@ def main() -> int:
         "has_dp": "DP" in format_fields,
         "has_gq": "GQ" in format_fields,
         "hpo_id_count": len(hpo_ids),
+        "hpo_source": hpo_source,
         "phenopacket_created": True,
     }
     SAFE_RECEIPT_PATH.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
