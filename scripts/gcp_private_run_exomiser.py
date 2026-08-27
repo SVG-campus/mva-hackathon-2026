@@ -21,6 +21,7 @@ PROPERTIES_PATH = PRIVATE_DIR / "application-hg38-2602.properties"
 SAFE_RECEIPT_PATH = PRIVATE_DIR / "exomiser_safe_receipt.json"
 
 SHUFFLED_HPO = ["HP:0000365", "HP:0001250", "HP:0002090"]
+ROOT_HPO = ["HP:0000001"]
 
 
 def yaml_quote(value: str) -> str:
@@ -67,6 +68,16 @@ def run_case(
     output_dir = RUN_DIR / name
     output_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     log_path = RUN_DIR / f"{name}.log"
+    existing_outputs = [path for path in output_dir.iterdir() if path.is_file() and path.stat().st_size > 0]
+    existing_names = {path.name for path in existing_outputs}
+    expected_names = {f"{name}.jsonl", f"{name}.genes.tsv", f"{name}.variants.tsv"}
+    if expected_names.issubset(existing_names):
+        return {
+            "status": "PASS_REUSED_EXISTING",
+            "runtime_seconds": 0.0,
+            "output_file_count": len(existing_outputs),
+            "output_extensions": sorted({path.suffix.lower() for path in existing_outputs}),
+        }
     command = [
         "java",
         "-Xmx20g",
@@ -118,7 +129,7 @@ def main() -> int:
     baseline_packet = Path(detail["phenopacket"])
     frequency_packet = PRIVATE_DIR / "phenopacket-frequency-only.yml"
     shuffled_packet = PRIVATE_DIR / "phenopacket-shuffled.yml"
-    write_packet(frequency_packet, sample_id, vcf, [])
+    write_packet(frequency_packet, sample_id, vcf, ROOT_HPO)
     write_packet(shuffled_packet, sample_id, vcf, SHUFFLED_HPO)
 
     PROPERTIES_PATH.write_text(
