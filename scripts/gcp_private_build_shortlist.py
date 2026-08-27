@@ -59,6 +59,7 @@ class PairResult:
     combined_score: float
     phenotype_score: float
     variant_score: float
+    max_frequency: float
 
     @property
     def key(self) -> tuple[str, tuple[Variant, Variant]]:
@@ -126,6 +127,7 @@ def read_pairs(path: Path) -> list[PairResult]:
                 combined_score=_float(first, "EXOMISER_GENE_COMBINED_SCORE"),
                 phenotype_score=_float(first, "EXOMISER_GENE_PHENO_SCORE"),
                 variant_score=_float(first, "EXOMISER_GENE_VARIANT_SCORE"),
+                max_frequency=max(_float(row, "MAX_FREQ") for row in rows),
             )
         )
     return sorted(results, key=lambda item: (item.rank, item.gene, item.variants))
@@ -153,22 +155,31 @@ def _panel_bonus(gene: str) -> tuple[float, str]:
 def _rank_candidates(
     baseline: dict[tuple[str, tuple[Variant, Variant]], PairResult],
     challenger: dict[tuple[str, tuple[Variant, Variant]], PairResult],
-    frequency: dict[tuple[str, tuple[Variant, Variant]], PairResult],
+    ablated: dict[tuple[str, tuple[Variant, Variant]], PairResult],
     shuffled: dict[tuple[str, tuple[Variant, Variant]], PairResult],
 ) -> list[dict[str, object]]:
     candidate_keys = set(baseline) | set(challenger)
+    rarity_order = sorted(
+        candidate_keys,
+        key=lambda key: (
+            (baseline.get(key) or challenger[key]).max_frequency,
+            (baseline.get(key) or challenger[key]).rank,
+            key,
+        ),
+    )
+    rarity_ranks = {key: rank for rank, key in enumerate(rarity_order, start=1)}
     candidates: list[dict[str, object]] = []
     for key in candidate_keys:
         primary = baseline.get(key)
         secondary = challenger.get(key)
         anchor = primary or secondary
         assert anchor is not None
-        frequency_result = frequency.get(key)
+        ablated_result = ablated.get(key)
         shuffled_result = shuffled.get(key)
         baseline_score = primary.combined_score if primary else 0.0
         challenger_score = secondary.combined_score if secondary else 0.0
         control_score = max(
-            frequency_result.combined_score if frequency_result else 0.0,
+            ablated_result.combined_score if ablated_result else 0.0,
             shuffled_result.combined_score if shuffled_result else 0.0,
         )
         phenotype_delta = max(0.0, baseline_score - control_score)
@@ -192,8 +203,10 @@ def _rank_candidates(
                 "variants": [variant.__dict__ for variant in anchor.variants],
                 "baseline_rank": primary.rank if primary else None,
                 "challenger_rank": secondary.rank if secondary else None,
-                "frequency_only_rank": frequency_result.rank if frequency_result else None,
+                "phenotype_ablation_rank": ablated_result.rank if ablated_result else None,
                 "phenotype_shuffle_rank": shuffled_result.rank if shuffled_result else None,
+                "rarity_only_rank": rarity_ranks[key],
+                "pair_max_frequency_percent": anchor.max_frequency,
                 "baseline_combined_score": baseline_score,
                 "challenger_combined_score": challenger_score,
                 "phenotype_specificity_delta": phenotype_delta,
@@ -262,8 +275,8 @@ def main() -> int:
     detail = json.loads(QC_DETAIL.read_text(encoding="utf-8"))
     candidates = _rank_candidates(
         _case_map("baseline_exome"),
-        _case_map("challenger_genome"),
-        _case_map("frequency_only"),
+        _case_map("challenger_introns"),
+        _case_map("phenotype_ablation"),
         _case_map("phenotype_shuffle"),
     )
     if not candidates:

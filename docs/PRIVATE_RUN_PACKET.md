@@ -15,7 +15,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 ## Alternatives
 
 1. **Selected baseline:** private VCF-first Exomiser analysis with explicit compound-heterozygous pair formation.
-2. **Challenger:** retain splice-region, intronic, regulatory, and MVA-mechanism candidates without making the known-gene panel a hard exclusion.
+2. **Challenger:** use Exomiser's official `preset-exome-analysis-with-introns.yml` to retain splice-relevant intronic candidates, then apply the MVA mechanism set only as a soft feature rather than a hard exclusion. A full Genomiser run is out of scope for this first window because its REMM dependency is not installed.
 3. **Escalation:** FASTQ reanalysis only if the VCF sufficiency falsifier fails and a new storage/cost packet is approved.
 4. **Abstention:** do not consume a live attempt if no candidate pair survives technical, inheritance, disease-validity, and privacy review.
 
@@ -25,7 +25,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 - Organizer processor/deletion answer: discussion #2, timestamp `2026-08-26T22:28:34Z`.
 - GCP public synthetic receipt: `PUBLIC_PREFLIGHT_RECEIPT.md`.
 - Provider decision: `PROVIDER_TERMS_CHECKLIST.md`.
-- Local structural suite: 15 tests passed at commit `3ecaca1`.
+- Local structural suite: 19 tests passed after the private intake, control, and compound-pair shortlist gates were added.
 
 ## Decision
 
@@ -41,7 +41,7 @@ Create one isolated ephemeral GCP VM in the exact owner-selected project/account
 
 - Stop if the VCF build, sample, genotype, call-quality, or indexing checks fail.
 - Stop if a command would print, transmit, or persist a genome-scale table outside the private VM.
-- Phenotype-shuffle, frequency-only, panel-ablation, and pair-ablation controls must remain in the receipt even when unfavorable.
+- Phenotype-shuffle, phenotype-ablation, panel-ablation, and pair-ablation controls must remain in the receipt even when unfavorable. A true frequency-only ordering is derived separately from reported population-frequency fields; removing HPO terms alone is not labelled frequency-only.
 - Abstain if no candidate pair survives rarity, quality, inheritance, disease-validity, and literature review.
 - A changed evaluator, schema, dataset manifest, or source commit invalidates the frozen replay.
 

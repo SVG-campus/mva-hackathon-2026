@@ -12,7 +12,7 @@
 
 ## Method abstract
 
-We use a transparent, VCF-first rare-disease prioritisation workflow designed for an exact compound-heterozygous-pair submission. Structural checks and normalization precede phenotype-aware prioritisation with Exomiser 15.1.0 and its frozen 2602 GRCh38 and phenotype datasets. The baseline combines call quality, population rarity, functional consequence, recessive/compound-heterozygous inheritance, phenotype similarity, curated disease evidence, and segregation or phasing evidence when available. A pre-registered challenger retains splice-region, intronic, regulatory, and other non-coding candidates and treats known MVA mechanisms as a soft prioritisation feature rather than a hard gene-list exclusion. Candidate pairs remain together in one scored row. Phenotype-shuffle, frequency-only, panel-ablation, and pair-ablation controls test whether the ranking depends on the claimed biological and scoring signals. Automated outputs undergo documented manual review of primary literature and disease-validity evidence before EPCR assignment. This design is reproducible and inexpensive, but it can miss causal events absent from or poorly represented in the supplied VCF; failed VCF sufficiency triggers a separately governed FASTQ reanalysis. A ranked challenge submission is a research hypothesis, not a diagnosis or medical recommendation.
+We use a transparent, VCF-first rare-disease prioritisation workflow designed for an exact compound-heterozygous-pair submission. Structural checks and normalization precede phenotype-aware prioritisation with Exomiser 15.1.0 and its frozen 2602 GRCh38 and phenotype datasets. The baseline combines call quality, population rarity, functional consequence, recessive/compound-heterozygous inheritance, phenotype similarity, curated disease evidence, and segregation or phasing evidence when available. A pre-registered challenger uses Exomiser's documented exome-with-introns model to retain splice-relevant intronic candidates and treats known MVA mechanisms as a soft prioritisation feature rather than a hard gene-list exclusion. Candidate pairs remain together in one scored row. Phenotype-shuffle, phenotype-ablation, panel-ablation, frequency-order, and pair-ablation controls test whether the ranking depends on the claimed biological and scoring signals. Automated outputs undergo documented manual review of primary literature and disease-validity evidence before EPCR assignment. This design is reproducible and inexpensive, but it can miss causal events absent from or poorly represented in the supplied VCF; failed VCF sufficiency triggers a separately governed FASTQ reanalysis. A ranked challenge submission is a research hypothesis, not a diagnosis or medical recommendation.
 
 ## Inputs and data boundary
 
@@ -27,7 +27,7 @@ We use a transparent, VCF-first rare-disease prioritisation workflow designed fo
 1. Verify file hashes, reference build, sample count, genotype fields, index integrity, normalization status, and call-quality fields with `bcftools`/`tabix`.
 2. Normalize only when required and preserve an immutable source copy inside the private environment.
 3. Run the frozen Exomiser phenotype-driven baseline under recessive and compound-heterozygous inheritance models.
-4. Run the challenger with splice/non-coding retention and a soft MVA mechanism prior, while preserving a phenotype-wide route.
+4. Run the official exome-with-introns challenger with splice-relevant intronic retention and a soft MVA mechanism prior, while preserving a phenotype-wide route.
 5. Form candidate pairs explicitly and keep both variants in the same submission row.
 6. Apply the frozen controls and retain failures rather than tuning them away.
 7. Review the short list against primary literature, curated disease validity, population frequency, inheritance, segregation/phasing, and mechanism plausibility.
@@ -60,7 +60,8 @@ No real-data result exists yet. Populate this table only after the private run a
 ## Negative controls and sensitivity checks
 
 - Phenotype shuffle: a phenotype-driven ranking should materially degrade.
-- Frequency-only baseline: the full model must add evidence beyond rarity alone.
+- Phenotype ablation: the full model must add evidence beyond a no-HPO run.
+- Frequency ordering: the full model must add evidence beyond a population-frequency-only ordering derived from reported frequency fields.
 - Panel ablation: a candidate that survives only a narrow MVA panel is labelled panel-dependent.
 - Pair ablation: splitting a pair must reproduce the expected scorer penalty.
 - VCF sufficiency: missing genotype/call fields, QC failure, or no defensible pair triggers a separately approved FASTQ decision.

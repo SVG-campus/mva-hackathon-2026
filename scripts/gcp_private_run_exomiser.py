@@ -57,7 +57,13 @@ def write_packet(path: Path, sample_id: str, vcf: str, hpo_ids: list[str]) -> No
     path.chmod(0o600)
 
 
-def run_case(name: str, preset: str, packet: Path, vcf: str) -> dict[str, object]:
+def run_case(
+    name: str,
+    analysis_option: str,
+    analysis_value: str,
+    packet: Path,
+    vcf: str,
+) -> dict[str, object]:
     output_dir = RUN_DIR / name
     output_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     log_path = RUN_DIR / f"{name}.log"
@@ -68,8 +74,8 @@ def run_case(name: str, preset: str, packet: Path, vcf: str) -> dict[str, object
         "-jar",
         str(JAR_PATH),
         "analyse",
-        "--preset",
-        preset,
+        analysis_option,
+        analysis_value,
         "--sample",
         str(packet),
         "--vcf",
@@ -130,14 +136,24 @@ def main() -> int:
     RUN_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
 
     cases = {
-        "baseline_exome": ("exome", baseline_packet),
-        "challenger_genome": ("genome", baseline_packet),
-        "frequency_only": ("exome", frequency_packet),
-        "phenotype_shuffle": ("exome", shuffled_packet),
+        "baseline_exome": ("--preset", "exome", baseline_packet),
+        "challenger_introns": (
+            "--analysis",
+            str(CLI_DIR / "examples" / "preset-exome-analysis-with-introns.yml"),
+            baseline_packet,
+        ),
+        "phenotype_ablation": ("--preset", "exome", frequency_packet),
+        "phenotype_shuffle": ("--preset", "exome", shuffled_packet),
     }
     receipt: dict[str, object] = {"status": "PASS", "case_count": len(cases), "cases": {}}
-    for name, (preset, packet) in cases.items():
-        receipt["cases"][name] = run_case(name, preset, packet, vcf)  # type: ignore[index]
+    for name, (analysis_option, analysis_value, packet) in cases.items():
+        receipt["cases"][name] = run_case(  # type: ignore[index]
+            name,
+            analysis_option,
+            analysis_value,
+            packet,
+            vcf,
+        )
 
     SAFE_RECEIPT_PATH.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     SAFE_RECEIPT_PATH.chmod(0o600)
