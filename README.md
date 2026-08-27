@@ -20,7 +20,7 @@ The project is intentionally designed so public code operates on synthetic fixtu
 python -m pytest -q --basetemp=local_dev\pytest-readme
 ```
 
-The current receipt is **20 tests passing**. To validate a structurally complete Track 1 CSV without submitting it:
+The current receipt is **21 tests passing**. To validate a structurally complete Track 1 CSV without submitting it:
 
 ```powershell
 & 'C:\Users\svillalobosgonzalez1\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\validate_track1_submission.py submission\synthetic\svillalobos-gonzalez_synthetic-dry-run.csv

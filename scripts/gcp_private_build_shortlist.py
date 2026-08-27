@@ -18,8 +18,8 @@ from typing import Iterable
 
 
 PRIVATE_DIR = Path("/srv/mva-private")
+OFFICIAL_PROBAND_ID = "PROBAND01"
 RUN_DIR = PRIVATE_DIR / "exomiser-runs"
-QC_DETAIL = PRIVATE_DIR / "private_qc_detail.json"
 SHORTLIST_PATH = PRIVATE_DIR / "candidate_shortlist_private.json"
 CSV_PATH = PRIVATE_DIR / "track1_predictions_private.csv"
 SAFE_RECEIPT_PATH = PRIVATE_DIR / "shortlist_safe_receipt.json"
@@ -240,7 +240,7 @@ def _strict_epcr(values: Iterable[float]) -> list[float]:
     return output
 
 
-def write_submission(proband_id: str, candidates: list[dict[str, object]]) -> None:
+def write_submission(candidates: list[dict[str, object]]) -> None:
     epcr_values = _strict_epcr(float(candidate["epcr_proxy"]) for candidate in candidates)
     with CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
@@ -252,7 +252,7 @@ def write_submission(proband_id: str, candidates: list[dict[str, object]]) -> No
             assert isinstance(first, dict) and isinstance(second, dict)
             writer.writerow(
                 {
-                    "proband_id": proband_id,
+                    "proband_id": OFFICIAL_PROBAND_ID,
                     "chrom_1": first["chrom"],
                     "pos_1": first["pos"],
                     "ref_1": first["ref"],
@@ -274,7 +274,6 @@ def write_submission(proband_id: str, candidates: list[dict[str, object]]) -> No
 
 def main() -> int:
     os.umask(0o077)
-    detail = json.loads(QC_DETAIL.read_text(encoding="utf-8"))
     candidates = _rank_candidates(
         _case_map("baseline_exome"),
         _case_map("challenger_introns"),
@@ -285,7 +284,7 @@ def main() -> int:
         raise RuntimeError("Fail closed: no two-variant AR candidates survived")
     SHORTLIST_PATH.write_text(json.dumps(candidates, indent=2) + "\n", encoding="utf-8")
     SHORTLIST_PATH.chmod(0o600)
-    write_submission(str(detail["sample_id"]), candidates)
+    write_submission(candidates)
     receipt = {
         "status": "PASS",
         "candidate_count": len(candidates),

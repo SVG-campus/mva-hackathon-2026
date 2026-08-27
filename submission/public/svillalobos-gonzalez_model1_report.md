@@ -22,7 +22,7 @@ The gated VCF, index, and phenotype document were accessed only on an isolated, 
 - The VCF was confirmed as GRCh38 with exactly one sample and readable indexed records.
 - GT, DP, and GQ fields were present.
 - Eight explicit HPO identifiers were found and converted to a local phenopacket.
-- The structural validator and 20 local tests passed.
+- The structural validator and 21 local tests passed, including an exact `PROBAND01` identifier gate.
 
 ## Computational approach
 
@@ -64,9 +64,9 @@ Strengths are exact-pair scorer alignment, reproducible public code, phenotype-w
 ## Reproducibility receipt
 
 - CSV schema validation: PASS, 1 row.
-- Local test suite: PASS, 20 tests.
+- Local test suite: PASS, 21 tests.
 - Candidate-as-truth evaluator replay: rank points 100, F-max 1.0 (hypothetical mechanics check only).
-- Prediction SHA-256: `B4BA215877DA41C84480A2D8D389BC9BEDE527577A8A0287F97E0A874CEBCFE9`.
+- Prediction SHA-256: `7D2CE57E853EC7EB101C4E396700B6523BDE63AFC96D3F168137A8FE5B6FD412`.
 - Source/evaluator hashes and public provenance are frozen in `docs/SOURCE_MANIFEST.md`.
 
 Claim ceiling: C2 observational challenge hypothesis. No clinical, diagnostic, therapeutic, or winning-probability claim is made.

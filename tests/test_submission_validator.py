@@ -3,12 +3,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.validate_track1_submission import EXPECTED_HEADERS, validate_track1_csv
+from scripts.validate_track1_submission import EXPECTED_HEADERS, OFFICIAL_PROBAND_ID, validate_track1_csv
 
 
 def _row(**overrides):
     row = {
-        "proband_id": "SYNTHETIC-ONLY",
+        "proband_id": OFFICIAL_PROBAND_ID,
         "chrom_1": "chr1",
         "pos_1": "100000",
         "ref_1": "A",
@@ -77,6 +77,11 @@ class Track1SubmissionValidatorTests(unittest.TestCase):
         ])
         self.assertFalse(result.ok)
         self.assertIn("all rows must use the same proband_id", result.errors)
+
+    def test_wrong_single_proband_id_fails(self):
+        result = self._validate([_row(proband_id="SYNTHETIC-ONLY")])
+        self.assertFalse(result.ok)
+        self.assertTrue(any("official challenge identifier" in error for error in result.errors))
 
     def test_wrong_headers_fail(self):
         headers = EXPECTED_HEADERS[:-1]

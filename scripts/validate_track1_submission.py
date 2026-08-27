@@ -29,6 +29,8 @@ EXPECTED_HEADERS = [
     "notes",
 ]
 
+OFFICIAL_PROBAND_ID = "PROBAND01"
+
 STANDARD_CHROMOSOME = re.compile(r"^chr(?:[1-9]|1[0-9]|2[0-2]|X|Y|M|MT)$")
 SECOND_VARIANT_FIELDS = ("chrom_2", "pos_2", "ref_2", "alt_2")
 
@@ -99,6 +101,10 @@ def validate_track1_csv(path: str | Path) -> ValidationResult:
             result.errors.append(f"{label}: proband_id is required")
         else:
             proband_ids.add(row["proband_id"])
+            if row["proband_id"] != OFFICIAL_PROBAND_ID:
+                result.errors.append(
+                    f"{label}: proband_id must be the official challenge identifier {OFFICIAL_PROBAND_ID}"
+                )
 
         for suffix in ("1",):
             for field_name in (f"chrom_{suffix}", f"pos_{suffix}", f"ref_{suffix}", f"alt_{suffix}"):
