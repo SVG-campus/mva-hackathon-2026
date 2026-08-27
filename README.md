@@ -2,23 +2,23 @@
 
 This repository is the local, reproducible preparation area for the SageBio **Rare Disease, Real Kid: MVA Hackathon 2026**.
 
-Current status: **public-source, synthetic-scorer, public-toolchain, and submission-scaffold pass only**. No real-child genomic or clinical data have been downloaded into this repository, no live challenge submission has been made, and no medical or causal claim has been established.
+Current status: **public-source, synthetic-scorer, public-toolchain, private-intake/QC, and submission-scaffold checks pass**. The gated inputs are processed only inside the approved ephemeral GCP boundary; no real-child genomic or clinical data have entered this repository. No live challenge submission has been made, and no medical or causal claim has been established.
 
 ## Selected development route
 
 1. Build a public, reproducible Track 1 baseline that ranks exact compound-heterozygous pairs using call quality, rarity, inheritance, functional evidence, and phenotype similarity.
-2. Compare it with a challenger that adds non-coding/splice analysis, the seven numbered MVA forms, and three lower-maturity no-miss genes.
+2. Compare it with Exomiser's documented exome-with-introns challenger, retaining splice-relevant intronic variants while treating the seven numbered MVA forms and three lower-maturity no-miss genes as a soft feature rather than a hard exclusion.
 3. Use Track 2 only after the causal pair and loss/gain-of-function mechanism pass a separate evidence gate.
 
-The project is intentionally designed so public code operates on synthetic fixtures. Real-data execution must occur in an approved local-only environment and emit only a manually reviewed, non-identifying submission artifact.
+The project is intentionally designed so public code operates on synthetic fixtures. Real-data execution occurs only in the approved isolated environment and emits at most a short, manually reviewed finding set and submission artifact permitted by the organizer's written guidance.
 
 ## Reproduce the current preliminary checks
 
 ```powershell
-& 'C:\Users\svillalobosgonzalez1\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest discover -s tests -v
+python -m pytest -q --basetemp=local_dev\pytest-readme
 ```
 
-The current receipt is **15 tests passing**. To validate a structurally complete Track 1 CSV without submitting it:
+The current receipt is **20 tests passing**. To validate a structurally complete Track 1 CSV without submitting it:
 
 ```powershell
 & 'C:\Users\svillalobosgonzalez1\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\validate_track1_submission.py submission\synthetic\svillalobos-gonzalez_synthetic-dry-run.csv
