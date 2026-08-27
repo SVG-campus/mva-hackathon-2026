@@ -53,6 +53,12 @@ def main() -> int:
         for role, path in role_paths.items()
         if path is not None
     }
+    file_access_ready = (
+        len(variants) == 1
+        and len(indexes) == 1
+        and len(phenotypes) == 1
+        and set(file_head_status.values()) == {200}
+    )
     receipt = {
         "token_present": True,
         "account_matches": account_matches,
@@ -62,9 +68,17 @@ def main() -> int:
         "index_candidate_count": len(indexes),
         "phenotype_candidate_count": len(phenotypes),
         "file_head_status": file_head_status,
+        "file_access_ready": file_access_ready,
     }
     print(json.dumps(receipt, sort_keys=True))
-    return 0 if whoami_http == 200 and dataset_http == 200 and account_matches else 3
+    return (
+        0
+        if whoami_http == 200
+        and dataset_http == 200
+        and account_matches
+        and file_access_ready
+        else 3
+    )
 
 
 if __name__ == "__main__":
