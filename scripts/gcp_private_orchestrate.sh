@@ -36,4 +36,10 @@ if ! /opt/mva-hf/bin/python /tmp/gcp_private_result_schema.py \
   exit 33
 fi
 
+if ! /opt/mva-hf/bin/python /tmp/gcp_private_build_shortlist.py \
+    > "${private_dir}/shortlist_driver.log" 2>&1; then
+  touch "${private_dir}/shortlist.failed"
+  exit 34
+fi
+
 touch "${private_dir}/orchestrator.done"

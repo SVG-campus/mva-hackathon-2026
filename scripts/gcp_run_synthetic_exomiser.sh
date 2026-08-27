@@ -81,6 +81,7 @@ java -Xmx16g -Dspring.config.location="file:${app_properties}" \
   --assembly hg38 \
   --output-directory "${results_dir}" \
   --output-filename public-synthetic \
+  --output-format=JSON,TSV_GENE,TSV_VARIANT \
   > "${work_dir}/exomiser_stdout.log" 2>&1
 end_epoch=$(date +%s)
 

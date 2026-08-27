@@ -80,6 +80,7 @@ def run_case(name: str, preset: str, packet: Path, vcf: str) -> dict[str, object
         str(output_dir),
         "--output-filename",
         name,
+        "--output-format=JSON,TSV_GENE,TSV_VARIANT",
     ]
     started = time.monotonic()
     with log_path.open("w", encoding="utf-8") as log:
