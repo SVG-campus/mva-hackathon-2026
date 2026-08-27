@@ -82,3 +82,7 @@ The Google Fonts endpoints are presentation dependencies, not challenge evidence
 - Carvalhal et al. (2022), BUB1: https://pmc.ncbi.nlm.nih.gov/articles/PMC8769543/
 - Guo et al. (2024), CEP192: https://doi.org/10.1016/j.xhgg.2023.100256
 - Ochiai et al. (2014), functional proof of an upstream BUB1B variant: https://pmc.ncbi.nlm.nih.gov/articles/PMC3910577/
+
+## Pre-submission drift check — 2026-08-27
+
+The live Space advanced to commit `1112710080520b3a2848d11b6ce1327dafbe79cf`. The two intervening commits changed template download controls and leaderboard performance. The `evaluation.py`, Track 1 CSV template, and methods workbook Git blob IDs are identical to the frozen release, so the pinned evaluator/schema replay remains valid. The current Track 1 form still requires a GitHub URL beginning with `https://github.com/`, one CSV, and one PDF or Markdown report; the Excel workbook is guidance for the report rather than a separate upload control.
