@@ -40,6 +40,7 @@ Create one isolated ephemeral GCP VM in the exact owner-selected project/account
 ## Retained execution failure
 
 - The first private QC invocation used a nonexistent `bcftools quickcheck` subcommand and therefore failed before inspecting variant records. The downloaded files matched their repository metadata and hashes. The guard was replaced with explicit repository-size equality, `bcftools view --header-only`, indexed-record, GRCh38, sample, and genotype checks; the failed marker is retained in the execution history rather than counted as a biological failure.
+- The supplied tabix index returned zero for `bcftools index --nrecords`; treating that metadata value as proof of an empty VCF caused the second fail-closed stop. The retry uses a bounded stream-presence test that reads only the first record inside the VM and emits only a boolean lower-bound receipt. No variant value is printed or transmitted.
 
 ## Falsifiers and negative controls
 

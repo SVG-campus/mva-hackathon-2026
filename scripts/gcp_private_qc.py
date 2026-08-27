@@ -31,6 +31,24 @@ def run(args: list[str], *, text: bool = True) -> subprocess.CompletedProcess[st
     return subprocess.run(args, check=False, capture_output=True, text=text)
 
 
+def has_at_least_one_record(vcf: Path) -> bool:
+    process = subprocess.Popen(
+        ["bcftools", "view", "--no-header", str(vcf)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    assert process.stdout is not None
+    first_record = process.stdout.readline()
+    process.terminate()
+    try:
+        process.communicate(timeout=10)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.communicate()
+    return bool(first_record.strip())
+
+
 def extract_clinical_text(path: Path) -> str:
     lower = path.name.lower()
     if lower.endswith(".docx"):
@@ -155,8 +173,12 @@ def main() -> int:
     if count_result.returncode != 0:
         raise RuntimeError("Fail closed: indexed record count failed")
     record_count = int(count_result.stdout.strip())
+    record_count_source = "index"
     if record_count <= 0:
-        raise RuntimeError("Fail closed: VCF contains no records")
+        if not has_at_least_one_record(vcf):
+            raise RuntimeError("Fail closed: VCF contains no readable records")
+        record_count = 1
+        record_count_source = "stream_presence_lower_bound"
 
     build_is_grch38 = (
         "GRCh38" in header
@@ -214,6 +236,7 @@ def main() -> int:
     detail = {
         "sample_id": sample_id,
         "record_count": record_count,
+        "record_count_source": record_count_source,
         "build": "GRCh38",
         "format_fields": sorted(format_fields),
         "hpo_ids": hpo_ids,
@@ -230,6 +253,7 @@ def main() -> int:
         "status": "PASS",
         "sample_count": 1,
         "record_count_positive": True,
+        "record_count_source": record_count_source,
         "build": "GRCh38",
         "has_gt": True,
         "has_dp": "DP" in format_fields,
