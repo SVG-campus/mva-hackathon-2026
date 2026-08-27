@@ -71,6 +71,7 @@ rm -f "${hg38_archive}"
 unzip -q "${phenotype_archive}" -d "${cli_dir}/data"
 rm -f "${phenotype_archive}"
 rm -f "${cli_archive}"
+chmod -R a+rX "${cli_dir}"
 
 {
   printf 'install_completed_utc='

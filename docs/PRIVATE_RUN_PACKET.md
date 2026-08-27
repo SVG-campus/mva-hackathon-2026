@@ -41,6 +41,7 @@ Create one isolated ephemeral GCP VM in the exact owner-selected project/account
 
 - The first private QC invocation used a nonexistent `bcftools quickcheck` subcommand and therefore failed before inspecting variant records. The downloaded files matched their repository metadata and hashes. The guard was replaced with explicit repository-size equality, `bcftools view --header-only`, indexed-record, GRCh38, sample, and genotype checks; the failed marker is retained in the execution history rather than counted as a biological failure.
 - The supplied tabix index returned zero for `bcftools index --nrecords`; treating that metadata value as proof of an empty VCF caused the second fail-closed stop. The retry uses a bounded stream-presence test that reads only the first record inside the VM and emits only a boolean lower-bound receipt. No variant value is printed or transmitted.
+- The first Exomiser baseline start failed because the public `2602_hg38` and `2602_phenotype` archive roots preserved owner-only directory modes. The earlier synthetic smoke ran under `sudo`, so it did not expose the mismatch. Repair is limited to `a+rX` on the public Exomiser installation; private input and result directories remain mode `0700`, and the failed output/log are moved to the private failure archive.
 
 ## Falsifiers and negative controls
 
