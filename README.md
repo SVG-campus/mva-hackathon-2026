@@ -2,6 +2,8 @@
 
 This repository is the local, reproducible preparation area for the SageBio **Rare Disease, Real Kid: MVA Hackathon 2026**.
 
+Original repository material is released under [CC BY 4.0](LICENSE.md); third-party components retain their own terms as listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 Current status: **public-source, synthetic-scorer, public-toolchain, private-intake/QC, four-route analysis, bounded candidate review, and Model 1 packaging checks pass**. Gated inputs were processed only inside the approved ephemeral GCP boundary. No raw genomic file, clinical narrative, genome-scale table, or reconstructive intermediate entered this repository; only organizer-permitted short findings and aggregate receipts were reduced from the private run. No live challenge submission has been made, and no medical or causal claim has been established.
 
 ## Selected development route
