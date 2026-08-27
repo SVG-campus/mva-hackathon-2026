@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Run fail-closed private VCF/phenotype QC and emit only aggregate status."""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import zipfile
+from pathlib import Path
+from xml.etree import ElementTree
+
+
+BASE_DIR = Path("/srv/mva-private")
+MANIFEST_PATH = BASE_DIR / "private_manifest.json"
+DETAIL_PATH = BASE_DIR / "private_qc_detail.json"
+SAFE_RECEIPT_PATH = BASE_DIR / "qc_safe_receipt.json"
+PHENOPACKET_PATH = BASE_DIR / "phenopacket.yml"
+CLINICAL_TEXT_PATH = BASE_DIR / "clinical_text.txt"
+HPO_RE = re.compile(r"HP:\d{7}")
+
+
+def run(args: list[str], *, text: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(args, check=False, capture_output=True, text=text)
+
+
+def extract_clinical_text(path: Path) -> str:
+    lower = path.name.lower()
+    if lower.endswith(".docx"):
+        chunks: list[str] = []
+        with zipfile.ZipFile(path) as archive:
+            for name in archive.namelist():
+                if not name.startswith("word/") or not name.endswith(".xml"):
+                    continue
+                root = ElementTree.fromstring(archive.read(name))
+                chunks.extend(node.text for node in root.iter() if node.text)
+        return "\n".join(chunks)
+    if lower.endswith((".txt", ".json", ".yaml", ".yml")):
+        return path.read_text(encoding="utf-8", errors="replace")
+    raise RuntimeError("Fail closed: unsupported clinical document format")
+
+
+def yaml_quote(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
+
+
+def main() -> int:
+    os.umask(0o077)
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    vcf = Path(manifest["local_files"]["variant"])
+    index = Path(manifest["local_files"]["index"])
+    phenotype = Path(manifest["local_files"]["phenotype"])
+    if not all(path.is_file() for path in (vcf, index, phenotype)):
+        raise RuntimeError("Fail closed: a selected private input is missing")
+
+    quickcheck = run(["bcftools", "quickcheck", "-v", str(vcf)])
+    if quickcheck.returncode != 0:
+        raise RuntimeError("Fail closed: bcftools quickcheck failed")
+
+    sample_result = run(["bcftools", "query", "--list-samples", str(vcf)])
+    samples = [line.strip() for line in sample_result.stdout.splitlines() if line.strip()]
+    if sample_result.returncode != 0 or len(samples) != 1:
+        raise RuntimeError("Fail closed: expected exactly one VCF sample")
+    sample_id = samples[0]
+
+    count_result = run(["bcftools", "index", "--nrecords", str(vcf)])
+    if count_result.returncode != 0:
+        raise RuntimeError("Fail closed: indexed record count failed")
+    record_count = int(count_result.stdout.strip())
+    if record_count <= 0:
+        raise RuntimeError("Fail closed: VCF contains no records")
+
+    header_result = run(["bcftools", "view", "--header-only", str(vcf)])
+    if header_result.returncode != 0:
+        raise RuntimeError("Fail closed: VCF header read failed")
+    header = header_result.stdout
+    build_is_grch38 = (
+        "GRCh38" in header
+        or "hg38" in header.lower()
+        or bool(re.search(r"##contig=<ID=(?:chr)?1,length=248956422(?:,|>)", header))
+    )
+    if not build_is_grch38:
+        raise RuntimeError("Fail closed: GRCh38 could not be established")
+    format_fields = {
+        match.group(1)
+        for match in re.finditer(r"^##FORMAT=<ID=([^,>]+)", header, flags=re.MULTILINE)
+    }
+    if "GT" not in format_fields:
+        raise RuntimeError("Fail closed: genotype field is absent")
+
+    clinical_text = extract_clinical_text(phenotype)
+    CLINICAL_TEXT_PATH.write_text(clinical_text, encoding="utf-8")
+    CLINICAL_TEXT_PATH.chmod(0o600)
+    hpo_ids = sorted(set(HPO_RE.findall(clinical_text)))
+    if not hpo_ids:
+        raise RuntimeError("Fail closed: no explicit HPO identifiers found")
+
+    phenopacket_lines = [
+        "---",
+        f"id: {yaml_quote(sample_id)}",
+        "subject:",
+        f"  id: {yaml_quote(sample_id)}",
+        "phenotypicFeatures:",
+    ]
+    for hpo_id in hpo_ids:
+        phenopacket_lines.extend(["  - type:", f"      id: {hpo_id}"])
+    phenopacket_lines.extend(
+        [
+            "htsFiles:",
+            f"  - uri: {yaml_quote(str(vcf))}",
+            "    htsFormat: VCF",
+            "    genomeAssembly: hg38",
+            "metaData:",
+            "  created: '2026-08-27T00:00:00Z'",
+            "  createdBy: private-frozen-pipeline",
+            "  resources: []",
+            "  phenopacketSchemaVersion: 1.0",
+        ]
+    )
+    PHENOPACKET_PATH.write_text("\n".join(phenopacket_lines) + "\n", encoding="utf-8")
+    PHENOPACKET_PATH.chmod(0o600)
+
+    detail = {
+        "sample_id": sample_id,
+        "record_count": record_count,
+        "build": "GRCh38",
+        "format_fields": sorted(format_fields),
+        "hpo_ids": hpo_ids,
+        "vcf": str(vcf),
+        "index": str(index),
+        "phenotype": str(phenotype),
+        "phenopacket": str(PHENOPACKET_PATH),
+    }
+    DETAIL_PATH.write_text(json.dumps(detail, indent=2) + "\n", encoding="utf-8")
+    DETAIL_PATH.chmod(0o600)
+
+    receipt = {
+        "status": "PASS",
+        "sample_count": 1,
+        "record_count_positive": True,
+        "build": "GRCh38",
+        "has_gt": True,
+        "has_dp": "DP" in format_fields,
+        "has_gq": "GQ" in format_fields,
+        "hpo_id_count": len(hpo_ids),
+        "phenopacket_created": True,
+    }
+    SAFE_RECEIPT_PATH.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    SAFE_RECEIPT_PATH.chmod(0o600)
+    print(json.dumps(receipt, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
