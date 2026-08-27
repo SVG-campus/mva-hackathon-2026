@@ -2,9 +2,9 @@
 
 ## Decision
 
-Use a **new dedicated GCP project**, not GitHub and not Kaggle, for the private VCF-first run. GitHub is the wrong storage boundary for gated patient data; Kaggle would add a second hosted dataset/notebook platform and an avoidable data-release ambiguity. GCP is explicitly contemplated by the challenge's cloud-compute rule and supports short-lived, auditable deletion.
+Use only the **owner-selected existing GCP project with free credits**, not GitHub, Kaggle, or another GCP project, for the private VCF-first run. Isolate the hackathon with dedicated `mva-` network, firewall, VM, disk, labels, and deletion receipts. Three pre-existing buckets and every other unrelated resource in the shared project are out of scope and must remain untouched. GitHub is the wrong storage boundary for gated patient data; Kaggle would add a second hosted dataset/notebook platform and an avoidable data-release ambiguity. GCP is explicitly contemplated by the challenge's cloud-compute rule and supports short-lived, auditable deletion.
 
-On 2026-08-25 the user authorized a dedicated project and public-only toolchain preflight under the USD 20 ceiling. The exact project/resource identifiers are retained only in an ignored local state file. No gated challenge data or Hugging Face token entered the VM.
+On 2026-08-27 the user explicitly directed all work to the currently configured default GCP project/account because that project holds the free credits. Exact identifiers are retained only in an ignored local state file. A VM briefly created in the earlier dedicated project during the instruction handoff was immediately deleted before toolchain installation or data access; the auto-delete disk was also removed. No gated challenge data or Hugging Face token entered that VM.
 
 The user has accepted the dataset terms. The organizer's 2026-08-26 point-by-point guidance permits hosted processing when the service takes no rights in the data, performs no training, and uses only limited-purpose, time-bounded retention. Before private execution, complete `docs/PROVIDER_TERMS_CHECKLIST.md` for GCP and any annotation or AI service actually used. Authentication must be interactive; credentials and tokens must never be pasted into chat, source, shell history, or captured logs. Patient-derived content remains unavailable to this agent until the exact Codex/OpenAI plan and settings independently pass the same checklist.
 
@@ -12,7 +12,7 @@ The user has accepted the dataset terms. The organizer's 2026-08-26 point-by-poi
 
 | Resource | Setting |
 |---|---|
-| Project | brand-new, challenge-only project |
+| Project | exact owner-selected shared project/account in ignored local state; only frozen `mva-` resources are in scope |
 | Region/zone | `us-central1` / `us-central1-a`, unless policy requires another US region |
 | VM | `e2-standard-8` (8 vCPU, 32 GB RAM), no GPU |
 | Boot disk | 200 GB `pd-balanced`, encrypted by default, auto-delete |
@@ -26,8 +26,8 @@ Google bills a running VM even when idle; after the first minute it is billed by
 
 ## Owner-side preflight
 
-1. Create or select a brand-new project that contains no other workloads.
-2. Link the intended billing account and note the exact project ID.
+1. Verify the active project and account exactly match the owner-selected values in ignored `private_state/` before every mutation.
+2. Confirm billing is enabled and inventory existing resources; never touch non-`mva-` resources.
 3. In the Pricing Calculator/Console, verify the six-hour estimate for the frozen envelope.
 4. Create a USD 20 budget alert at 25%, 50%, 75%, 90%, and 100%, while acknowledging that it does not cap charges.
 5. Run `gcloud auth login` only in the user's own interactive terminal. Never share the resulting credential material or create application-default credentials unless a separately reviewed workflow actually requires them.
@@ -38,14 +38,14 @@ Google bills a running VM even when idle; after the first minute it is billed by
 These are a reviewed template, not commands to run blindly. Replace only the three owner variables. Keep one PowerShell session end-to-end.
 
 ```powershell
-$mvaProjectId = 'REPLACE_WITH_DEDICATED_PROJECT_ID'
+$mvaProjectId = 'LOAD_FROM_IGNORED_LOCAL_STATE'
 $mvaZone = 'us-central1-a'
 $mvaRegion = 'us-central1'
 $mvaNetwork = 'mva-private-net'
 $mvaSubnet = 'mva-private-subnet'
 $mvaVm = 'mva-vcf-preflight'
 
-if ($mvaProjectId -eq 'REPLACE_WITH_DEDICATED_PROJECT_ID') { throw 'Set the dedicated project ID first.' }
+if ($mvaProjectId -eq 'LOAD_FROM_IGNORED_LOCAL_STATE') { throw 'Load and verify the owner-selected project ID first.' }
 
 gcloud config set project $mvaProjectId
 gcloud services enable compute.googleapis.com iap.googleapis.com --project $mvaProjectId
@@ -115,7 +115,7 @@ gcloud compute networks subnets delete $mvaSubnet --project $mvaProjectId --regi
 gcloud compute networks delete $mvaNetwork --project $mvaProjectId --quiet
 ```
 
-At the final post-hackathon deletion gate, the safest disposition is deletion of the dedicated project after the owner verifies it contains no shared resources. Project deletion and billing unlinking are manual owner approvals, not automatic steps in this runbook.
+At the final post-hackathon deletion gate, delete only the frozen `mva-` VM, disk, network, subnet, firewall, temporary credentials, and private outputs. Never delete, disable billing for, or otherwise alter the shared project or its unrelated resources.
 
 ## Primary GCP references
 
@@ -127,7 +127,8 @@ At the final post-hackathon deletion gate, the safest disposition is deletion of
 
 ## Falsifiers and stop rules
 
-- Stop before creation if the project is not dedicated, the estimate exceeds the approved ceiling, or deletion controls cannot be verified.
+- Stop before creation if the active project/account do not exactly match ignored local state, any frozen `mva-` name collides with an unexpected resource, the estimate exceeds the approved ceiling, or deletion controls cannot be verified.
+- Stop if any command would enumerate and mutate resources by broad wildcard or project-wide deletion; every destructive target must be an exact frozen `mva-` name.
 - Stop before data retrieval if shell history, command logging, notebook telemetry, or network egress could expose patient-level content.
 - Delete the VM immediately if unexpected snapshots, service-account scopes, public artifacts, or nonessential agents are present.
 - Escalate disk/CPU or retrieve FASTQs only through a separate decision packet and owner approval.

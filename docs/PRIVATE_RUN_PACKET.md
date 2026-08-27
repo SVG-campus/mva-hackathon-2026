@@ -9,7 +9,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 - Dataset terms are accepted and the authenticated account is authorized to access the gated files.
 - The VCF is GRCh38 and exposes usable sample, genotype, call-quality, and inheritance fields; this remains unverified until private QC.
 - The public evaluator and submission schema frozen in `SOURCE_MANIFEST.md` remain current.
-- Google Cloud Compute Engine/Persistent Disk is used only as the documented processor route; no patient content enters Codex, GitHub, Kaggle, Vertex AI, hosted notebooks, MCP servers, support tickets, feedback, or an unreviewed API.
+- Google Cloud Compute Engine/Persistent Disk is used only through isolated, exactly named `mva-` resources in the owner-selected free-credit project. Pre-existing buckets and unrelated resources remain untouched. No patient content enters Codex, GitHub, Kaggle, Vertex AI, hosted notebooks, MCP servers, support tickets, feedback, or an unreviewed API.
 - Family structure, phasing, coverage, and structural/non-coding sensitivity may be incomplete.
 
 ## Alternatives
@@ -29,7 +29,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 
 ## Decision
 
-Create one dedicated ephemeral GCP VM, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. Keep all live attempts unconsumed until the candidate universe, EPCR mapping, report, and evaluator replay are frozen.
+Create one isolated ephemeral GCP VM in the exact owner-selected project/account, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. Keep all live attempts unconsumed until the candidate universe, EPCR mapping, report, and evaluator replay are frozen.
 
 ## Claim ceiling
 

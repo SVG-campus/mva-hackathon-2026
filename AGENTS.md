@@ -15,6 +15,7 @@ This project supports the 2026 SageBio "Rare Disease, Real Kid" MVA Hackathon.
 - Local read-only research, synthetic tests, and reversible code edits are allowed.
 - Submissions, outreach, account changes, public repository creation/push, video upload, cloud compute, and spend require explicit user authorization.
 - Do not consume any of the six Track 1 attempts or the single Track 2 attempt during development.
+- For this project, use only the owner-selected default Google Cloud project and account recorded in ignored `private_state/`. Verify both before every mutating command. Isolate hackathon resources by the frozen `mva-` names; never read, modify, move, or delete pre-existing unrelated resources in that shared project.
 
 ## Evidence rules
 
