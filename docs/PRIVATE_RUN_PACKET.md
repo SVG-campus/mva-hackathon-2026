@@ -7,7 +7,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 ## Assumptions and unknowns
 
 - Dataset terms are accepted and the authenticated account is authorized to access the gated files.
-- The VCF is GRCh38 and exposes usable sample, genotype, call-quality, and inheritance fields; this remains unverified until private QC.
+- The VCF is GRCh38 and exposes one sample with GT, DP, and GQ fields; private QC passed. Family phasing/segregation remains unavailable.
 - The public evaluator and submission schema frozen in `SOURCE_MANIFEST.md` remain current.
 - Google Cloud Compute Engine/Persistent Disk is used only through isolated, exactly named `mva-` resources in the owner-selected free-credit project. Pre-existing buckets and unrelated resources remain untouched. No patient content enters Codex, GitHub, Kaggle, Vertex AI, hosted notebooks, MCP servers, support tickets, feedback, or an unreviewed API.
 - Family structure, phasing, coverage, and structural/non-coding sensitivity may be incomplete.
@@ -29,7 +29,17 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 
 ## Decision
 
-Create one isolated ephemeral GCP VM in the exact owner-selected project/account, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. Keep all live attempts unconsumed until the candidate universe, EPCR mapping, report, and evaluator replay are frozen.
+Create one isolated ephemeral GCP VM in the exact owner-selected project/account, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. This route completed. The conservative Model 1 package contains one BUB1B candidate pair; its missense partner remains a VUS and trans phase is not established. Keep all live attempts unconsumed until the owner approves the exact public repository and submission package.
+
+## Result receipt
+
+- Intake: PASS for one VCF, one index, one phenotype document, three recorded hashes, and 317,514,212 downloaded bytes.
+- QC: PASS for one GRCh38 sample, readable records, GT/DP/GQ, and eight explicit HPO identifiers.
+- Successful route runtimes: baseline 142 seconds, intronic challenger 360 seconds, phenotype ablation 111 seconds, phenotype shuffle 148 seconds; 761 seconds total.
+- Leading exact pair: BUB1B, baseline/intronic rank 2, phenotype-ablation rank 5, phenotype-shuffle rank 6, rarity-only rank 27.
+- Technical lead-pair evidence: both variants PASS, heterozygous, GQ 99, and balanced allele depths. No PS/PID/PGT field establishes trans phase.
+- Model 1 CSV: one row, structural validator PASS. Candidate-as-truth evaluator replay produces 100 rank points and F-max 1.0; this is a mechanics sensitivity check, not knowledge of the hidden answer.
+- Claim ceiling: C2 observational challenge hypothesis, not diagnosis or clinical validation.
 
 ## Claim ceiling
 

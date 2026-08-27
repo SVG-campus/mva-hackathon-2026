@@ -2,7 +2,7 @@
 
 This repository is the local, reproducible preparation area for the SageBio **Rare Disease, Real Kid: MVA Hackathon 2026**.
 
-Current status: **public-source, synthetic-scorer, public-toolchain, private-intake/QC, and submission-scaffold checks pass**. The gated inputs are processed only inside the approved ephemeral GCP boundary; no real-child genomic or clinical data have entered this repository. No live challenge submission has been made, and no medical or causal claim has been established.
+Current status: **public-source, synthetic-scorer, public-toolchain, private-intake/QC, four-route analysis, bounded candidate review, and Model 1 packaging checks pass**. Gated inputs were processed only inside the approved ephemeral GCP boundary. No raw genomic file, clinical narrative, genome-scale table, or reconstructive intermediate entered this repository; only organizer-permitted short findings and aggregate receipts were reduced from the private run. No live challenge submission has been made, and no medical or causal claim has been established.
 
 ## Selected development route
 
@@ -40,4 +40,5 @@ The current receipt is **20 tests passing**. To validate a structurally complete
 - `tests/test_scoring_mechanics.py` — synthetic tests of evaluator behavior.
 - `scripts/validate_track1_submission.py` — fail-closed official-schema and rank validation before evaluator replay.
 - `submission/track1_report_scaffold.md` — public-safe report structure with no patient-specific result.
+- `submission/public/` — publication-reviewed Model 1 CSV, report, evidence card, and methods workbook prepared for the final owner gate.
 - `submission/synthetic/` — artificial dry-run files that must never be uploaded to the challenge.
