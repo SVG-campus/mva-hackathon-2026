@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from scripts.gcp_private_build_shortlist import _strict_epcr, read_pairs
+from scripts.gcp_private_candidate_details import extract_details
 from scripts.gcp_private_intake import classify
 from scripts.gcp_private_qc import map_hpo_terms
 from scripts.gcp_private_run_exomiser import write_packet
@@ -59,6 +60,20 @@ def test_shortlist_parser_keeps_exact_ar_pairs(tmp_path: Path) -> None:
     assert pairs[0].gene == "BUB1B"
     assert all(variant.chrom == "chr15" for variant in pairs[0].variants)
     assert [variant.pos for variant in pairs[0].variants] == [100, 200]
+    details = extract_details(
+        output,
+        [
+            {
+                "gene": "BUB1B",
+                "variants": [
+                    {"chrom": "chr15", "pos": 100, "ref": "A", "alt": "G"},
+                    {"chrom": "chr15", "pos": 200, "ref": "C", "alt": "T"},
+                ],
+            }
+        ],
+    )
+    assert len(details) == 1
+    assert len(details[0]["variants"]) == 2
 
 
 def test_shortlist_epcr_is_strictly_descending() -> None:
