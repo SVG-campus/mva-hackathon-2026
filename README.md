@@ -4,7 +4,7 @@ This repository is the local, reproducible preparation area for the SageBio **Ra
 
 Original repository material is released under [CC BY 4.0](LICENSE.md); third-party components retain their own terms as listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Current status: **public-source, synthetic-scorer, public-toolchain, private-intake/QC, four-route analysis, bounded candidate review, and Model 1 packaging checks pass**. Gated inputs were processed only inside the approved ephemeral GCP boundary. No raw genomic file, clinical narrative, genome-scale table, or reconstructive intermediate entered this repository; only organizer-permitted short findings and aggregate receipts were reduced from the private run. No live challenge submission has been made, and no medical or causal claim has been established.
+Current status: **Track 1 Submission 1 received the maximum automated result: 100.0/100 rank points, F-max 1.000, and full match at rank 1**. The leaderboard displays the entry at position 39 among tied maximum-score submissions; that position reflects ordering among ties, not a lower automated score. One of six Track 1 attempts has been used. Gated inputs were processed only inside the approved ephemeral GCP boundary. No raw genomic file, clinical narrative, genome-scale table, or reconstructive intermediate entered this repository; only organizer-permitted short findings and aggregate receipts were reduced from the private run. This result is an exact challenge-answer match, not a diagnosis, independent clinical validation, or evidence of winning the separately judged methods review.
 
 ## Selected development route
 
@@ -35,6 +35,7 @@ The current receipt is **21 tests passing**. To validate a structurally complete
 - `docs/GCP_RUNBOOK.md` — tested public-only ephemeral design and remaining private-data gates.
 - `docs/ORGANIZER_QUESTIONS.md` — unresolved questions for the user to post or email manually.
 - `docs/PUBLIC_PREFLIGHT_RECEIPT.md` — public GCP/Exomiser test, retained failures, and teardown proof.
+- `docs/SUBMISSION_1_RECEIPT.md` — immutable artifact hashes, live automated score, quota, and claim limits for the first Track 1 attempt.
 - `docs/RESEARCH_GAP_MATRIX.md` — searched-versus-known coverage and decisive open gaps.
 - `docs/SUBMISSION_WALKTHROUGH.md` — calendar and manual submission checkpoints.
 - `docs/TOOLCHAIN.md` — pinned public analysis stack, versions, integrity limits, and licenses.

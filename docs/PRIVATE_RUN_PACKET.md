@@ -29,7 +29,7 @@ Can the supplied gated VCF support a defensible ranked compound-heterozygous Tra
 
 ## Decision
 
-Create one isolated ephemeral GCP VM in the exact owner-selected project/account, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. This route completed. The conservative Model 1 package contains one BUB1B candidate pair; its missense partner remains a VUS and trans phase is not established. Keep all live attempts unconsumed until the owner approves the exact public repository and submission package.
+Create one isolated ephemeral GCP VM in the exact owner-selected project/account, retrieve only the VCF/index/phenotype inputs, run frozen QC and Exomiser routes, execute negative controls, and export only a short manually reviewed finding set. This route completed. The conservative Model 1 package contains one BUB1B candidate pair; its missense partner remains a VUS and trans phase is not established. The owner subsequently approved the exact public repository, public push, and Track 1 Attempt 1. The recorded attempt received the maximum automated score; see `SUBMISSION_1_RECEIPT.md`.
 
 ## Result receipt
 
