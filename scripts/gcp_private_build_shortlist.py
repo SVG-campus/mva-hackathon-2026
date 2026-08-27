@@ -72,8 +72,10 @@ def _float(row: dict[str, str], name: str) -> float:
 
 
 def _variant(row: dict[str, str]) -> Variant:
+    raw_chrom = (row.get("CONTIG") or "").strip()
+    chrom = raw_chrom if raw_chrom.startswith("chr") else f"chr{raw_chrom}"
     return Variant(
-        chrom=(row.get("CONTIG") or "").strip().removeprefix("chr"),
+        chrom=chrom,
         pos=int((row.get("START") or "0").strip()),
         ref=(row.get("REF") or "").strip().upper(),
         alt=(row.get("ALT") or "").strip().upper(),

@@ -57,6 +57,7 @@ def test_shortlist_parser_keeps_exact_ar_pairs(tmp_path: Path) -> None:
     pairs = read_pairs(output)
     assert len(pairs) == 1
     assert pairs[0].gene == "BUB1B"
+    assert all(variant.chrom == "chr15" for variant in pairs[0].variants)
     assert [variant.pos for variant in pairs[0].variants] == [100, 200]
 
 
